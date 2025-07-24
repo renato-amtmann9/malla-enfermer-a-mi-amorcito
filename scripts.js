@@ -1,28 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const cursos = document.querySelectorAll(".course");
+  const semestres = document.querySelectorAll(".semester");
 
-  cursos.forEach((curso, index) => {
-    const clave = `curso-enfermeria-${index}`;
+  semestres.forEach((semestre, sIndex) => {
+    const cursos = semestre.querySelectorAll(".course");
 
-    if (localStorage.getItem(clave) === "true") {
-      curso.classList.add("aprobado");
-    }
+    cursos.forEach((curso, cIndex) => {
+      const clave = `curso-${sIndex}-${cIndex}`;
 
-    curso.addEventListener("click", () => {
-      curso.classList.toggle("aprobado");
-      const aprobado = curso.classList.contains("aprobado");
-      localStorage.setItem(clave, aprobado);
-
-      // Verificar si completó el semestre
-      const semestre = curso.closest(".semester");
-      const todos = semestre.querySelectorAll(".course");
-      const completados = semestre.querySelectorAll(".course.aprobado");
-
-      if (todos.length === completados.length) {
-        const titulo = semestre.querySelector("h2").textContent;
-        alert(`🎉 ¡Felicidades! Completaste ${titulo}. ¡Sigue así futura enfermera! 👩‍⚕️💖`);
+      // Restaurar estado guardado
+      if (localStorage.getItem(clave) === "true") {
+        curso.classList.add("aprobado");
       }
+
+      curso.addEventListener("click", () => {
+        curso.classList.toggle("aprobado");
+        const aprobado = curso.classList.contains("aprobado");
+        localStorage.setItem(clave, aprobado);
+
+        // Verificar si todos los cursos del semestre están aprobados
+        const todos = semestre.querySelectorAll(".course");
+        const aprobados = semestre.querySelectorAll(".course.aprobado");
+
+        if (todos.length === aprobados.length) {
+          const titulo = semestre.querySelector("h2").textContent;
+          if (!semestre.classList.contains("completado")) {
+            alert(`🎉 ¡Felicidades! Completaste ${titulo}. ¡Sigue así futura enfermera! 👩‍⚕️💖`);
+            semestre.classList.add("completado");
+          }
+        } else {
+          semestre.classList.remove("completado");
+        }
+      });
     });
   });
 });
+
 
