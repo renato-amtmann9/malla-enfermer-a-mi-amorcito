@@ -1,4 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // 💬 Mostrar frase motivadora aleatoria
+  const frases = [
+    "¡Tú puedes, futura enfermera! 💪",
+    "Un día a la vez, ¡pero sin rendirse! 🌟",
+    "Recuerda por qué empezaste 🩺❤️",
+    "¡Cada clic es un paso más cerca de tu título! 🎓",
+    "Estás hecha para esto. ¡Ánimo! 💖"
+  ];
+  alert(frases[Math.floor(Math.random() * frases.length)]);
+
   const data = [
     ["1° Año - Primer Semestre", ["🧬 Biología Celular", "🧠 Razonamiento Matemático", "👩‍⚕️ Bases Teóricas de la Enfermería", "🧠 Morfología Integral", "🧪 Química General y Orgánica"]],
     ["1° Año - Segundo Semestre", ["🧪 Bioquímica", "🧠 Psicología Evolutiva", "🌎 Socioantropología", "👩‍⚕️ Bases del Cuidado de Enfermería", "🦠 Microbiología", "🗣 Habilidades Comunicativas"]],
@@ -13,13 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const grid = document.querySelector(".grid");
-
   data.forEach((semestreData, sIndex) => {
-    const [titulo, ramos] = semestreData;
+    const [tituloOriginal, ramos] = semestreData;
     const semestreDiv = document.createElement("div");
     semestreDiv.classList.add("semester");
     const h2 = document.createElement("h2");
-    h2.textContent = titulo;
+    h2.textContent = tituloOriginal;
     semestreDiv.appendChild(h2);
 
     ramos.forEach((ramo, cIndex) => {
@@ -38,39 +47,42 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem(clave, aprobado);
 
         updateProgress();
-
-        const cursos = semestreDiv.querySelectorAll(".course");
-        const aprobadosCursos = semestreDiv.querySelectorAll(".course.aprobado");
-        const keyFin = `semestre-${sIndex}-completado`;
-
-        if (cursos.length === aprobadosCursos.length && !localStorage.getItem(keyFin)) {
-          alert(`🎉 ¡Felicidades! Completaste ${titulo}. ¡Sigue brillando futura enfermera! 👩‍⚕️💖`);
-          confetti();
-          localStorage.setItem(keyFin, "true");
-        }
-
-        if (cursos.length !== aprobadosCursos.length) {
-          localStorage.removeItem(keyFin);
-        }
+        checkSemestre(semestreDiv, h2, tituloOriginal, sIndex);
       });
 
       div.addEventListener("dblclick", () => {
         const nota = prompt("📝 Escribe una nota sobre este ramo:");
-        if (nota) alert(`💾 Nota guardada: "${nota}" (solo visible ahora)`);
+        if (nota) alert(`💾 Nota guardada: "${nota}" (visible solo ahora)`);
       });
 
       semestreDiv.appendChild(div);
     });
 
     grid.appendChild(semestreDiv);
+    checkSemestre(semestreDiv, h2, tituloOriginal, sIndex);
   });
+  function checkSemestre(semDiv, h2, titulo, sIndex) {
+    const cursos = semDiv.querySelectorAll(".course");
+    const aprobados = semDiv.querySelectorAll(".course.aprobado");
+    const keyFin = `semestre-${sIndex}-completado`;
+
+    if (cursos.length === aprobados.length && !localStorage.getItem(keyFin)) {
+      alert(`🎉 ¡Felicidades! Completaste ${titulo}. ¡Sigue brillando futura enfermera! 👩‍⚕️💖`);
+      h2.innerHTML = `${titulo} 🏅`;
+      confetti();
+      localStorage.setItem(keyFin, "true");
+    } else if (cursos.length !== aprobados.length) {
+      h2.innerHTML = titulo;
+      localStorage.removeItem(keyFin);
+    }
+  }
 
   function updateProgress() {
     const all = document.querySelectorAll(".course");
     const done = document.querySelectorAll(".course.aprobado");
     const percent = Math.round((done.length / all.length) * 100);
     document.getElementById("progress-bar").style.width = percent + "%";
-    document.getElementById("progress-text").textContent = `Progreso: ${percent}%`;
+    document.getElementById("progress-text").textContent = `Progreso: ${done.length} aprobados / ${all.length} ramos (${percent}%)`;
   }
 
   document.getElementById("reset-btn").addEventListener("click", () => {
@@ -88,4 +100,46 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   updateProgress();
+  // 📅 Calendario interactivo
+  function generateCalendar() {
+    const calendar = document.getElementById("calendar");
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const monthName = now.toLocaleString('default', { month: 'long' });
+
+    let html = `<h3>${monthName.toUpperCase()} ${year}</h3><div style='display:flex;flex-wrap:wrap;'>`;
+
+    const weekDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+    weekDays.forEach(d => {
+      html += `<div class="calendar-day" style="background:#f9d3e0;font-weight:bold">${d}</div>`;
+    });
+
+    for (let i = 0; i < firstDay; i++) {
+      html += `<div class="calendar-day empty"></div>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = `nota-${year}-${month}-${day}`;
+      const nota = localStorage.getItem(key) || "";
+      html += `<div class="calendar-day" data-day="${day}" onclick="agendar(${day})">${day}<span class="note">${nota}</span></div>`;
+    }
+
+    html += "</div>";
+    calendar.innerHTML = html;
+  }
+
+  window.agendar = function(day) {
+    const now = new Date();
+    const key = `nota-${now.getFullYear()}-${now.getMonth()}-${day}`;
+    const nota = prompt("📝 ¿Qué quieres agendar para el día " + day + "?");
+    if (nota !== null) {
+      localStorage.setItem(key, nota);
+      generateCalendar();
+    }
+  };
+
+  generateCalendar();
 });
