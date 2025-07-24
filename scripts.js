@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cursos.forEach((curso, cIndex) => {
       const clave = `curso-${sIndex}-${cIndex}`;
 
-      // Restaurar estado guardado
+      // Restaurar estado
       if (localStorage.getItem(clave) === "true") {
         curso.classList.add("aprobado");
       }
@@ -17,18 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const aprobado = curso.classList.contains("aprobado");
         localStorage.setItem(clave, aprobado);
 
-        // Verificar si todos los cursos del semestre están aprobados
-        const todos = semestre.querySelectorAll(".course");
+        // Verificar todos los cursos del semestre
+        const todosCursos = semestre.querySelectorAll(".course");
         const aprobados = semestre.querySelectorAll(".course.aprobado");
 
-        if (todos.length === aprobados.length) {
-          const titulo = semestre.querySelector("h2").textContent;
-          if (!semestre.classList.contains("completado")) {
-            alert(`🎉 ¡Felicidades! Completaste ${titulo}. ¡Sigue así futura enfermera! 👩‍⚕️💖`);
-            semestre.classList.add("completado");
+        if (todosCursos.length === aprobados.length) {
+          const yaMostrado = localStorage.getItem(`semestre-${sIndex}-completado`);
+          if (!yaMostrado) {
+            const titulo = semestre.querySelector("h2").textContent;
+            alert(`🎉 ¡Felicidades! Completaste ${titulo}. ¡Sigue brillando futura enfermera! 🩺💖`);
+            localStorage.setItem(`semestre-${sIndex}-completado`, "true");
           }
         } else {
-          semestre.classList.remove("completado");
+          localStorage.removeItem(`semestre-${sIndex}-completado`);
         }
       });
     });
