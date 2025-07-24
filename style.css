@@ -103,3 +103,37 @@ button:hover {
   font-style: italic;
 }
 
+/* Calendario */
+.calendar-container {
+  max-width: 700px;
+  margin: 40px auto;
+  background: #fff0f8;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.calendar-day {
+  border: 1px solid #f2c4d2;
+  width: 14.2%;
+  height: 100px;
+  display: inline-block;
+  vertical-align: top;
+  box-sizing: border-box;
+  padding: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  background-color: white;
+  position: relative;
+}
+
+.calendar-day:hover {
+  background-color: #ffeef3;
+}
+
+.calendar-day .note {
+  font-size: 10px;
+  margin-top: 5px;
+  color: #a2466b;
+  display: block;
+}
