@@ -89,6 +89,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateProgress();
 });
-
-
-
